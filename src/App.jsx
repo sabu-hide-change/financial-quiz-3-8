@@ -1180,6 +1180,10 @@ export default function App() {
       setErrorMsg("合言葉を入力してください。");
       return;
     }
+    if (uid.length < 4) {
+      setErrorMsg("合言葉は4文字以上で入力してください。");
+      return;
+    }
     setErrorMsg("");
     setLoggingIn(true);
     console.log("[Login] 合言葉での接続を開始します。userId=", uid);
@@ -1436,19 +1440,21 @@ export default function App() {
   }
 
   // 【最重要】ログイン完了（合言葉入力＋復元完了）まではログイン画面のみを描画
+  // 注意：内部コンポーネントは <LoginScreen /> ではなく LoginScreen() として
+  // インライン展開する。これにより毎レンダー時の再マウント（入力欄のフォーカス喪失）を防ぐ。
   if (!isAuthenticated || screen === "login") {
-    return <LoginScreen />;
+    return LoginScreen();
   }
 
   return (
     <div className="min-h-screen bg-slate-950 font-sans text-slate-100">
       <div className="mx-auto max-w-4xl px-4 py-6">
-        <Header />
-        {screen === "dashboard" && <Dashboard />}
-        {screen === "quiz" && <QuizScreen />}
-        {screen === "result" && <ResultScreen />}
+        {Header()}
+        {screen === "dashboard" && Dashboard()}
+        {screen === "quiz" && QuizScreen()}
+        {screen === "result" && ResultScreen()}
       </div>
-      {showResumeModal && <ResumeModal />}
+      {showResumeModal && ResumeModal()}
     </div>
   );
 
@@ -1799,7 +1805,7 @@ export default function App() {
         </div>
 
         {/* 解説エリア（解答後のみ展開） */}
-        {isAnswered && <ExplanationPanel q={q} />}
+        {isAnswered && ExplanationPanel({ q })}
 
         {isAnswered ? (
           <button
